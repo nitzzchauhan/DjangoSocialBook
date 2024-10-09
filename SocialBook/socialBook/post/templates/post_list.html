@@ -1,0 +1,161 @@
+
+<script >
+    function showComments(event){
+        
+        const cr = event.target.getAttribute('cr');
+        const id = event.target.getAttribute('id');
+       
+         const nameButton = document.getElementById(id).innerText 
+       
+         const comments = document.getElementById('aaa'+cr+'aaa') 
+
+        console.log(cr,id,nameButton,comments,event.target)
+        try{
+            if (nameButton == 'Show Comments'){            
+                comments.style.display = 'block'
+                document.getElementById(id).innerText = 'Hide Comments'
+            }
+            else{
+                comments.style.display = 'none'
+                document.getElementById(id).innerText = 'Show Comments'
+            }
+        }  
+        catch(error){
+            console.log(error)
+        }  
+        
+       
+        
+    
+    }
+</script>
+
+
+{% extends "layout.html" %}
+{% load static %}
+
+{% block title %} Post List {% endblock %}
+
+
+
+{% block content %}
+    <center>
+        <!-- Button to create a new post -->
+        <a href="{% url 'post_create' %}" class="btn btn-primary mb-4">Create Post</a>
+    </center>
+    
+    <!-- Posts container -->
+
+<center>
+
+
+    <div class="container row gap-3 text-center justify-content-center">
+        {% for post in posts %}
+        <hr>
+        <div class="card bg-dark" style="width: 25rem; border: 2px solid red; color:white" >
+            
+            <!-- Post image -->
+            {% if post.photo %}
+             <img src="{{ post.photo.url }}" class="card-img-top" alt="Image for {{ post.user.username }}'s post" style="border: 0.5px solid white; margin-top: 10px; border-radius:10px">
+            {% else %}
+             <img src="#" class="card-img-top" alt="Default Image">
+            {% endif %}
+            
+            <!-- Post details -->
+            <div class="card-body" >
+                <h5 class="card-title">{{ post.user.username }}</h5>
+                <p class="card-text">{{ post.text|truncatechars:100 }}</p>
+                
+                <!-- Like button for posts -->
+                <p>{{ post.total_likes }} Likes</p>
+            <form method="POST" action="{% url 'like_post' post.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary">
+                    {% if user in post.likes.all %}
+                    Unlike
+                    {% else %}
+                    Like
+                    {% endif %}
+                </button>
+            </form>
+            
+            <!-- Edit and Delete options for post owner -->
+            {% if post.user == user %}<a href="{% url 'post_edit' post.id %}" class="btn btn-primary mb-2">Edit</a>
+            
+            <form method="POST" action="{% url 'post_delete' post.id %}" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Delete</button>
+            </form>
+            {% endif %}
+     
+        </div>
+        
+        <!-- Comment Section -->
+        <button onclick="showComments(event)" class="btn btn-success mb-3" id="{{ post.created_at }}" cr="{{post.created_at}}">Show Comments</button>
+        <div class="card-body"  style="display:none" id="aaa{{post.created_at}}aaa">
+            <h6>Comments</h6>
+            
+            <!-- Display all comments for this post -->
+            {% for comment in post.comments.all %}
+            <div class="comment mb-2">
+                <p><strong>{{ comment.user.username }}:</strong> {{ comment.content }}</p>
+                
+                <!-- Like button for comments -->
+                <p>{{ comment.total_likes }} Likes</p>
+                <form method="POST" action="{% url 'like_comment' comment.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary btn-sm">
+                        {% if user in comment.likes.all %}
+                        Unlike
+                        {% else %}
+                            Like
+                        {% endif %}
+                    </button>
+                </form>
+                
+                <!-- Edit and Delete options for comment owner -->
+                {% if comment.user == user %}
+                <!-- Edit Comment Form -->
+                <form method="POST" action="{% url 'edit_comment' comment.id %}">
+                    {% csrf_token %}
+                    <textarea name="content" rows="2" class="form-control">{{ comment.content }}</textarea>
+                    <button type="submit" class="btn btn-primary btn-sm mt-1">Update</button>
+                </form>
+
+                    <!-- Delete Comment -->
+                    <form method="POST" action="{% url 'delete_comment' comment.id %}" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-sm mt-1">Delete</button>
+                    </form>
+                    {% endif %}
+                </div>
+                {% empty %}
+                <p>No comments yet.</p>
+                {% endfor %}
+                
+                <!-- Add new comment form -->
+                <form method="POST" action="{% url 'add_comment' post.id %}">
+                    {% csrf_token %}
+                    <textarea name="content" rows="2" class="form-control" placeholder="Add a comment..."></textarea>
+                    <button type="submit" class="btn btn-primary btn-sm mt-1">Comment</button>
+                </form>
+            </div>
+
+        </div>
+    {% endfor %}
+</div>
+
+</center>
+
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Post
+{% endblock %}
+
+{% block content %}
+
+<div class="text-white text-center">
+    Welcome to It Vedant Institute    
+</div>
+<h2>
+    {% if form.instance.pk %}
+    Edit Post
+    {% else %}
+    <h1 class="text-center">Create Post</h1>    
+    {% endif %}
+    <form class="text-center" method='POST' enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p}}
+        <button class="btn btn-warning" type='submit'>Post
+        </button>
+    </form>
+    <a class='btn btn-primary text-center d-block mt-4 w-auto' href="{% url 'post_list' %}">Back to Post List</a>
+</h2>
+    
+
+
+{% endblock  %}
