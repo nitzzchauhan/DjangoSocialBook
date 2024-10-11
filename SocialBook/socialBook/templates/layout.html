@@ -18,6 +18,7 @@
         <a class="navbar-brand" href="{% url 'post_list' %}"
           ><h1>Social Book</h1></a
         >
+        
         {% comment %}
         <button
           class="navbar-toggler"
@@ -42,6 +43,8 @@
               >
             </li>
           </ul>
+
+          <h2 style="margin-right:20px">Welcome {{user}}</h2>
           {% comment %}
           <form class="d-flex" role="search">
             <input
